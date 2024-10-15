@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Street Nav</title>
+    <style>
+      html, body, #street-view {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVHNEeznNak430vKjbJZuTJv5rIDsZtic"></script>
+    <script>
+      let panorama;
+
+      function initialize() {
+        const location = { lat: 40.748817, lng: -73.985428 };
+
+        panorama = new google.maps.StreetViewPanorama(
+          document.getElementById("street-view"),
+          {
+            position: location,
+            pov: {
+              heading: 34,
+              pitch: 10,
+            },
+            zoom: 1,
+            motionTracking: true,
+            motionTrackingControl: true,
+          }
+        );
+
+        document.getElementById("capture-btn").addEventListener("click", captureImage);
+        
+        window.addEventListener("keydown", handleKeyDown);
+      }
+
+      function handleKeyDown(event) {
+        const pov = panorama.getPov();
+        let newHeading = pov.heading;
+        let newPitch = pov.pitch;
+
+        switch (event.key) {
+          case "ArrowUp":
+            panorama.setPov({ heading: newHeading, pitch: newPitch });
+            panorama.setVisible(true);
+            moveForward();
+            break;
+
+          case "ArrowDown":
+            panorama.setPov({ heading: newHeading, pitch: newPitch });
+            panorama.setVisible(true);
+            moveBackward();
+            break;
+
+          case "ArrowLeft":
+            newHeading = (newHeading - 10) % 360;
+            panorama.setPov({ heading: newHeading, pitch: newPitch });
+            break;
+
+          case "ArrowRight":
+            // Rotate to the right
+            newHeading = (newHeading + 10) % 360;
+            panorama.setPov({ heading: newHeading, pitch: newPitch });
+            break;
+        }
+      }
+
+      function moveForward() {
+        const position = panorama.getPosition();
+        const newPosition = google.maps.geometry.spherical.computeOffset(position, 10, panorama.getPov().heading);
+        panorama.setPosition(newPosition);
+      }
+
+      function moveBackward() {
+        const position = panorama.getPosition();
+        const newPosition = google.maps.geometry.spherical.computeOffset(position, -10, panorama.getPov().heading);
+        panorama.setPosition(newPosition);
+      }
+
+      function captureImage() {
+        const position = panorama.getPosition();
+        const pov = panorama.getPov();
+
+        const streetViewImageUrl = `https://maps.googleapis.com/maps/api/streetview?size=600x400&location=${position.lat()},${position.lng()}&heading=${pov.heading}&pitch=${pov.pitch}&key=AIzaSyBVHNEeznNak430vKjbJZuTJv5rIDsZtic`;
+
+        document.getElementById("street-view-image").src = streetViewImageUrl;
+      }
+
+
+    </script>
+  </head>
+  <body onload="initialize()">
+    <div id="street-view" style="height: 100%;"></div>
+    <button id="capture-btn" style="position: absolute; bottom: 30px; left: 10px; z-index: 9999;">Capture Image</button>
+    <br>
+    <img id="street-view-image" alt="Street View Image" style="position: absolute; top: 50px; left: 10px; width: 600px; height: 400px;" />
+  </body>
+</html>

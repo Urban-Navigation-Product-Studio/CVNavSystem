@@ -1,0 +1,4 @@
+TavilySearchResults is designed to assist visually impaired users by providing detailed and accessible information 
+about specific buildings or establishments they are interested in. This tool performs searches based on user queries, 
+such as learning more about a nearby pizza shop, and returns relevant information such as the building's location, 
+services offered, hours of operation, contact information, and customer reviews.
